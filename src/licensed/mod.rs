@@ -74,7 +74,7 @@ impl LicensedState {
         self.license = license;
     }
 
-    pub(crate) fn get_license(&self) -> Option<License> {
+    pub fn get_license(&self) -> Option<License> {
         self.license.clone()
     }
 
