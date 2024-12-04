@@ -1,8 +1,8 @@
-mod client;
-mod commands;
-mod err;
-mod licensed;
-mod machine;
+pub mod client;
+pub mod commands;
+pub mod err;
+pub mod licensed;
+pub mod machine;
 
 use client::KeygenClient;
 use err::Error;
