@@ -27,7 +27,7 @@ pub struct LicensedState {
 }
 
 impl LicensedState {
-    pub(crate) fn load<R: Runtime>(
+    pub fn load<R: Runtime>(
         app: &AppHandle<R>,
         client: &KeygenClient,
         machine: &Machine,
@@ -70,7 +70,7 @@ impl LicensedState {
         Ok(Self { license: None })
     }
 
-    pub(crate) fn update(&mut self, license: Option<License>) {
+    pub fn update(&mut self, license: Option<License>) {
         self.license = license;
     }
 
@@ -78,7 +78,7 @@ impl LicensedState {
         self.license.clone()
     }
 
-    pub(crate) async fn validate_key(
+    pub async fn validate_key(
         &mut self,
         key: String,
         entitlements: Vec<String>,
@@ -162,7 +162,7 @@ impl LicensedState {
         }
     }
 
-    pub(crate) fn cache_license_key<R: Runtime>(key: &String, app: &AppHandle<R>) -> Result<()> {
+    pub fn cache_license_key<R: Runtime>(key: &String, app: &AppHandle<R>) -> Result<()> {
         let path = Self::get_license_key_cache_path(app)?;
 
         let mut f = File::create(path)?;
@@ -171,7 +171,7 @@ impl LicensedState {
         Ok(())
     }
 
-    pub(crate) fn get_cached_license_key<R: Runtime>(app: &AppHandle<R>) -> Result<Option<String>> {
+    pub fn get_cached_license_key<R: Runtime>(app: &AppHandle<R>) -> Result<Option<String>> {
         let path = Self::get_license_key_cache_path(app)?;
 
         // no license key
@@ -184,7 +184,7 @@ impl LicensedState {
         Ok(Some(key))
     }
 
-    pub(crate) fn remove_cached_license_key<R: Runtime>(app: &AppHandle<R>) -> Result<()> {
+    pub fn remove_cached_license_key<R: Runtime>(app: &AppHandle<R>) -> Result<()> {
         let path = Self::get_license_key_cache_path(app)?;
 
         if path.exists() {
@@ -194,7 +194,7 @@ impl LicensedState {
         Ok(())
     }
 
-    fn get_license_key_cache_path<R: Runtime>(app: &AppHandle<R>) -> Result<PathBuf> {
+    pub fn get_license_key_cache_path<R: Runtime>(app: &AppHandle<R>) -> Result<PathBuf> {
         // get app data dir
         let data_dir = app
             .path_resolver()
@@ -214,7 +214,7 @@ impl LicensedState {
         Ok(dir_path)
     }
 
-    pub(crate) fn cache_response<R: Runtime>(
+    pub fn cache_response<R: Runtime>(
         app: &AppHandle<R>,
         license_key: &String,
         cache: KeygenResponseCache,
@@ -232,7 +232,7 @@ impl LicensedState {
         Ok(())
     }
 
-    pub(crate) fn clear_response_cache<R: Runtime>(app: &AppHandle<R>) -> Result<()> {
+    pub fn clear_response_cache<R: Runtime>(app: &AppHandle<R>) -> Result<()> {
         // get cache dir
         let keygen_cache_dir = Self::get_response_cache_dir(app)?;
 
@@ -243,7 +243,7 @@ impl LicensedState {
         Ok(())
     }
 
-    fn clear_response_cache_except<R: Runtime>(
+    pub fn clear_response_cache_except<R: Runtime>(
         app: &AppHandle<R>,
         excluded_path: PathBuf,
     ) -> Result<()> {
@@ -264,7 +264,7 @@ impl LicensedState {
         Ok(())
     }
 
-    fn get_response_cache<R: Runtime>(
+    pub fn get_response_cache<R: Runtime>(
         app: &AppHandle<R>,
         license_key: &String,
     ) -> Result<Option<(KeygenResponseCache, PathBuf)>> {
@@ -286,7 +286,7 @@ impl LicensedState {
         Ok(Some((cache, path)))
     }
 
-    fn get_response_cache_path<R: Runtime>(
+    pub fn get_response_cache_path<R: Runtime>(
         app: &AppHandle<R>,
         license_key: &String,
     ) -> Result<PathBuf> {
@@ -308,7 +308,7 @@ impl LicensedState {
         Ok(dir_path)
     }
 
-    fn get_response_cache_dir<R: Runtime>(app: &AppHandle<R>) -> Result<PathBuf> {
+    pub fn get_response_cache_dir<R: Runtime>(app: &AppHandle<R>) -> Result<PathBuf> {
         // get app data dir
         let data_dir = app
             .path_resolver()
