@@ -34,7 +34,7 @@ pub struct KeygenResponseCache {
 }
 
 impl KeygenClient {
-    pub(crate) fn new(
+    pub fn new(
         custom_domain: Option<String>,
         api_url: Option<String>,
         account_id: Option<String>,
@@ -89,11 +89,11 @@ impl KeygenClient {
         HeaderValue::from_str(&input).unwrap()
     }
 
-    pub(crate) fn post(&self, url: String) -> RequestBuilder {
+    pub fn post(&self, url: String) -> RequestBuilder {
         self.http_client.request(Method::POST, url)
     }
 
-    pub(crate) fn build_url(&self, path: String, params: Option<Vec<(&str, &str)>>) -> Result<Url> {
+    pub fn build_url(&self, path: String, params: Option<Vec<(&str, &str)>>) -> Result<Url> {
         // get base url
         let base_url = self.get_base_url()?;
 
@@ -168,7 +168,7 @@ impl KeygenClient {
         Ok((res_text, res_json))
     }
 
-    pub(crate) fn verify_response(
+    pub fn verify_response(
         &self,
         req_method: String,
         req_url: Url,
@@ -215,7 +215,7 @@ impl KeygenClient {
         }
     }
 
-    pub(crate) fn verify_response_cache(
+    pub fn verify_response_cache(
         &self,
         res_cache: KeygenResponseCache,
     ) -> Result<LicenseResponse> {
@@ -253,7 +253,7 @@ impl KeygenClient {
         }
     }
 
-    pub(crate) fn verify_signature(
+    pub fn verify_signature(
         &self,
         data: String,
         signature: String,

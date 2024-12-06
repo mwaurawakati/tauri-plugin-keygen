@@ -6,6 +6,7 @@ mod machine;
 
 use client::KeygenClient;
 use err::Error;
+use license::License;
 use licensed::*;
 use machine::Machine;
 use tauri::{
@@ -116,4 +117,26 @@ impl Builder {
             })
             .build()
     }
+}
+
+
+pub struct Keygen<R: Runtime>(tauri::plugin::PluginHandle<R>);
+
+
+pub trait KeygenExt<R: Runtime> {
+    fn keygen(&self) -> &Keygen<R>;
+    fn get_license(&self) -> crate::Result<Option<License>>;
+}
+
+impl<R: Runtime, T: Manager<R>> crate::KeygenExt<R> for T {
+    fn keygen(&self) -> &Keygen<R> {
+        self.state::<Keygen<R>>().inner()
+    }
+    fn get_license(&self) -> crate::Result<Option<License>> {
+        let state = self.state::<Mutex<LicensedState>>();
+        let lstate = tauri::async_runtime::block_on(state.lock());
+        let license = lstate.get_license();
+        Ok(license)
+    }
+
 }

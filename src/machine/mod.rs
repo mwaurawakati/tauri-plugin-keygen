@@ -48,7 +48,7 @@ struct MachineFile {
 }
 
 impl Machine {
-    pub(crate) fn new(app_name: String, app_version: String) -> Self {
+    pub fn new(app_name: String, app_version: String) -> Self {
         let fingerprint = machine_uid::get().unwrap_or("".into());
         let name = whoami::devicename();
 
@@ -75,7 +75,7 @@ impl Machine {
         }
     }
 
-    pub(crate) async fn activate(
+    pub async fn activate(
         &self,
         licensed_state: &mut LicensedState,
         client: &KeygenClient,
@@ -146,7 +146,7 @@ impl Machine {
         }
     }
 
-    pub(crate) async fn checkout<R: Runtime>(
+    pub async fn checkout<R: Runtime>(
         &self,
         licensed_state: &LicensedState,
         client: &KeygenClient,
@@ -255,7 +255,7 @@ impl Machine {
         }
     }
 
-    pub(crate) fn load_machine_file<R: Runtime>(
+    pub fn load_machine_file<R: Runtime>(
         &self,
         license_key: &String,
         client: &KeygenClient,
@@ -368,7 +368,7 @@ impl Machine {
         Ok(())
     }
 
-    pub(crate) fn remove_machine_file<R: Runtime>(app: &AppHandle<R>) -> Result<()> {
+    pub fn remove_machine_file<R: Runtime>(app: &AppHandle<R>) -> Result<()> {
         let path = Self::get_machine_file_path(app)?;
         if path.exists() {
             fs::remove_file(path)?;

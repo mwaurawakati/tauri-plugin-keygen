@@ -146,3 +146,5 @@ pub async fn reset_license_key<R: Runtime>(app: AppHandle<R>, _window: Window<R>
     LicensedState::remove_cached_license_key(&app)?;
     Ok(())
 }
+
+
