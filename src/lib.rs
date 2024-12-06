@@ -119,13 +119,18 @@ impl Builder {
     }
 }
 
-
 pub struct Keygen<R: Runtime>(tauri::plugin::PluginHandle<R>);
-
 
 pub trait KeygenExt<R: Runtime> {
     fn keygen(&self) -> &Keygen<R>;
     fn get_license(&self) -> crate::Result<Option<License>>;
+    fn get_license_key(&self) -> crate::Result<Option<String>>;
+    fn validate_key(
+        &self,
+        key: String,
+        entitlements: Vec<String>,
+        cache_valid_response: bool,
+    ) -> crate::Result<License>;
 }
 
 impl<R: Runtime, T: Manager<R>> crate::KeygenExt<R> for T {
@@ -139,4 +144,47 @@ impl<R: Runtime, T: Manager<R>> crate::KeygenExt<R> for T {
         Ok(license)
     }
 
+    fn get_license_key(&self) -> crate::Result<Option<String>> {
+        LicensedState::get_cached_license_key(self.app_handle())
+    }
+
+    fn validate_key(
+        &self,
+        key: String,
+        entitlements: Vec<String>,
+        cache_valid_response: bool,
+    ) -> crate::Result<License> {
+        let lstate = self.state::<Mutex<LicensedState>>();
+        let mut licensed_state = tauri::async_runtime::block_on(lstate.lock());
+        let cstate = self.state::<Mutex<KeygenClient>>();
+        let client = tauri::async_runtime::block_on(cstate.lock());
+        let mstate = self.state::<Mutex<Machine>>();
+        let machine = tauri::async_runtime::block_on(mstate.lock());
+
+        match tauri::async_runtime::block_on(licensed_state.validate_key(
+            key,
+            entitlements,
+            &machine,
+            &client,
+        )) {
+            Ok((license, res_cache)) => {
+                // cache valid response
+                if license.valid && cache_valid_response && license.expiry.is_some() {
+                    LicensedState::cache_response(self.app_handle(), &license.key, res_cache)?;
+                }
+
+                // update state
+                licensed_state.update(Some(license.clone()));
+
+                // cache license key
+                LicensedState::cache_license_key(&license.key, self.app_handle())?;
+
+                Ok(license)
+            }
+            Err(err) => {
+                dbg!(&err);
+                Err(err.into())
+            }
+        }
+    }
 }
